@@ -2,9 +2,9 @@ require 'spec_helper'
  
 module Codebreaker
   describe Game do
+    let(:game) {Game.new}
       
     context "#start" do
-      let(:game) {Game.new}
 
       before do
         game.start
@@ -41,7 +41,6 @@ module Codebreaker
 
     context "#check" do
       context 'with wrong arguments' do
-        let(:game) {Game.new}
 
         context 'when argument missing' do
           it "raise ArgumentError" do
@@ -69,49 +68,50 @@ module Codebreaker
       end
 
       context 'with good argument' do
-        before(:all) do
-          @game = Game.new
-          @game.instance_variable_set(:@secret_code, '3123')
-        end
+          @tests = [
+            [3123, 5664, '', "returns '' when all number wrong"],
+            [3123, 5614, '-', "returns \"-\" when one of the numbers belongs to SC, but stays not in write place"],
+            [3123, 5164, '+', "returns \"+\" when one of the number in correct place"],
+            [3123, 3131, '++-', "returns \"++-\" when one of the number in different position and 2 numbers in correct place"],
+            [3123, 3123, '++++', "returns \"++++\" when user win the game"],
+            [1234, 5555, ''], 
+            [1234, 1551, '+'], 
+            [1234, 5634, '++'], 
+            [1234, 5234, '+++'], 
+            [1234, 1234, '++++'], 
+            [1234, 3556, '-'], 
+            [1234, 3456, '--'], 
+            [1234, 3451, '---'], 
+            [1234, 3421, '----'],
+            [1234, 1552, '+-'], 
+            [1234, 1542, '+--'], 
+            [1234, 1342, '+---'], 
+            [1234, 1532, '++-'], 
+            [1234, 1432, '++--'], 
+            [1234, 1233, '+++'], 
+            [1234, 1532, '++-'], 
+            [1234, 1432, '++--'], 
+            [1234, 2112, '--'], 
+            [3123, 3333, '++'], 
+            [3123, 3456, '+'], 
+            [1113, 3111, '++--'], 
+            [1113, 1111, '+++'], 
+            [1113, 5553, '+'], 
+            [1113, 3333, '+'],          
+          ]
 
-        it "returns \"\" when all number wrong" do
-          expect(@game.check('5664')).to be_empty
-        end
-        it "returns \"-\" when one of the numbers belongs to SC, but stays not in write place" do
-          expect(@game.check('5614')).to eq('-')
-        end
-        it "returns \"+\" when one of the number in correct place"  do
-          expect(@game.check('5164')).to eq('+')
-        end
-        it "returns \"++-\" when one of the number in different position and 2 numbers in correct place"  do
-          expect(@game.check('3134')).to eq('++-')
-        end
-        it "returns \"++++\" when user win the game" do
-          expect(@game.check('3123')).to eq('++++')
-        end
-
-        context 'without explain, but must work. Write your text:' do
-          it '+' do
-            expect(@game.check('5553')).to eq('+')
+          @tests.each do |test|
+            text = test[3] ? test[3] : "when secret_number = #{test[0]} and gues = #{test[1]} must return '#{test[2]}'"
+            it text do
+              game.instance_variable_set(:@secret_code, test[0].to_s)
+              expect(game.check(test[1])).to eq(test[2])
+            end
           end
-          it '+-' do
-            expect(@game.check(3333)).to eq('+-')
-          end
-          it '++--' do
-            @game.instance_variable_set(:@secret_code, '1113')
-            expect(@game.check(3111)).to eq('++--')
-          end
-          it '+++' do
-            @game.instance_variable_set(:@secret_code, '1113')
-            expect(@game.check(1111)).to eq('+++')
-          end
-
         end
-      end
     end
 
     context "#hint" do
-      let(:game) {Game.new}
+      
       it "can be called" do
         expect{game.hint}.not_to raise_error
       end
@@ -132,6 +132,35 @@ module Codebreaker
       end
     end
 
+    context "#score" do
+      it "return FixNum" do
+        expect(game.score).to be_instance_of(Fixnum)
+      end
+      it "return write value" do
+        game.instance_variable_set(:@round_number, 5)
+        game.instance_variable_set(:@hints_used, 5)
+        val = Game::DEF_MAX_SCORE - 5*50 - 5*10
+        expect(game.score).to eq(val)
+      end
+      it "changes with new round" do
+        expect{game.start}.to change{game.score}
+      end
+
+    end
+
+    context "#save" do
+      xit "change the file" do
+      end
+    end
+
+    context "#getScoreBoard" do
+      xit "get Score Board" do
+      end
+    end
+
+
+
+=begin
     context "#play" do
       it "show information about CONSTS"
       it "start the Game/New round"
@@ -143,6 +172,7 @@ module Codebreaker
       it "call 'play again?'"
       it "can opt to save information about the game"
     end
+=end
 
   end
 end

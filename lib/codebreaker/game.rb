@@ -1,6 +1,7 @@
 module Codebreaker
   class Game
     HINTS_COUNT = 2
+    DEF_MAX_SCORE = 500
 
     attr_reader :round_number
 
@@ -19,20 +20,27 @@ module Codebreaker
 
     def check (gues)
       raise ArgumentError, 'argument length must be equal 4' unless gues.to_s.length == 4
-      raise ArgumentError, 'argument must contain only numbers from 1 to 6' unless gues.to_s[/[1-6]+/].length == 4
+      raise ArgumentError, 'argument must contain only numbers from 1 to 6' unless gues.to_s[/[1-6]{4}/] == gues.to_s
       
       pluses = minuses = '' 
       sc_array = @secret_code.split('')
-      
-      gues.to_s.split('').each_with_index do |val, index|
+      gues_array = gues.to_s.split('')
+
+      gues_array.each_with_index do |val, index|
         if (val == sc_array[index]) 
-          sc_array[index] = 0
+          sc_array[index] = '0'
+          gues_array[index] = '+'
           pluses += '+'
-        elsif (sc_array.include?(val))
-          sc_array[sc_array.find_index(val)] = 0
+        end
+      end
+
+      gues_array.each_with_index do |val, index|
+        if (sc_array.include?(val))
+          sc_array[sc_array.find_index(val)] = '-'
           minuses += '-'
         end
       end
+
       result = pluses + minuses
     end
 
@@ -40,6 +48,18 @@ module Codebreaker
       raise 'Called hint to many times' unless @hints_used < HINTS_COUNT
       @hints_used += 1     
       @secret_code[Random.rand(4)]
+    end
+
+    def score
+      DEF_MAX_SCORE - @hints_used*50 - @round_number*10
+    end
+
+    def save
+
+    end
+
+    def getScoreBoard
+
     end
 
   end
