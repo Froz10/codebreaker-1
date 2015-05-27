@@ -24,17 +24,11 @@ module Codebreaker
         it "saves secret code with numbers from 1 to 6" do
           expect(@secret_code).to match(/[1-6]+/)
         end
-        it "set round number to 1" do
-          expect(game.round_number).to eq(1)
-        end
       end
         
       context 'when called not first time' do
         it "doesn't change the secret code" do
           expect{game.start}.not_to change{game.instance_variable_get(:@secret_code)}
-        end
-        it "increment round number" do
-          expect{game.start}.to change{game.round_number}.by(1)
         end
       end
     end
@@ -108,6 +102,11 @@ module Codebreaker
             end
           end
         end
+
+        it "increment round number" do
+          expect{game.check(1234)}.to change{game.round_number}.by(1)
+        end
+
     end
 
     context "#hint" do
@@ -137,42 +136,17 @@ module Codebreaker
         expect(game.score).to be_instance_of(Fixnum)
       end
       it "return write value" do
-        game.instance_variable_set(:@round_number, 5)
-        game.instance_variable_set(:@hints_used, 5)
-        val = Game::DEF_MAX_SCORE - 5*50 - 5*10
+        round_number = hints_used = 5
+        game.instance_variable_set(:@round_number, round_number)
+        game.instance_variable_set(:@hints_used, hints_used)
+        val = Game::DEF_MAX_SCORE - hints_used*Game::HINT_PENALTY - round_number*Game::ROUND_PENALTY
         expect(game.score).to eq(val)
       end
       it "changes with new round" do
-        expect{game.start}.to change{game.score}
+        expect{game.check(1234)}.to change{game.score}
       end
 
     end
-
-    context "#save" do
-      xit "change the file" do
-      end
-    end
-
-    context "#getScoreBoard" do
-      xit "get Score Board" do
-      end
-    end
-
-
-
-=begin
-    context "#play" do
-      it "show information about CONSTS"
-      it "start the Game/New round"
-      it "get user number"
-      it "check number"
-      it "can show hint at any time"
-      it "can be stoped"
-      it "repeat while user won or lost"
-      it "call 'play again?'"
-      it "can opt to save information about the game"
-    end
-=end
 
   end
 end
