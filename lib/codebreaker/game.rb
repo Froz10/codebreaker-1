@@ -1,18 +1,20 @@
 module Codebreaker
   class Game
     HINTS_COUNT = 2
-    DEF_MAX_SCORE = 500
+    MAX_SCORE = 500
+    MAX_ROUNDS = 500
     CODE_LENGTH = 4
     ROUND_PENALTY = 10
     HINT_PENALTY = 50
 
-    attr_reader :round_number, :gues_results
+    attr_reader :round_number, :gues_results, :game_status
 
     def initialize
       @secret_code = ""
       @round_number = 0
       @hints_used = 0
       @gues_results = {}
+      @game_status = 'play'
     end
  
     def start
@@ -46,6 +48,8 @@ module Codebreaker
       result = pluses + minuses
       @gues_results[gues.to_s] = result
       @round_number += 1
+      @game_status = 'win' if result == '++++'
+      @game_status = 'loose' if @round_number >= MAX_ROUNDS
       result
     end
 
@@ -56,7 +60,7 @@ module Codebreaker
     end
 
     def score
-      DEF_MAX_SCORE - @hints_used*HINT_PENALTY - @round_number*ROUND_PENALTY
+      MAX_SCORE - @hints_used*HINT_PENALTY - @round_number*ROUND_PENALTY
     end
   end
 end
