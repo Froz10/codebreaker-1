@@ -6,12 +6,13 @@ module Codebreaker
     ROUND_PENALTY = 10
     HINT_PENALTY = 50
 
-    attr_reader :round_number
+    attr_reader :round_number, :gues_and_results
 
     def initialize
       @secret_code = ""
       @round_number = 0
       @hints_used = 0
+      @gues_and_results = {}
     end
  
     def start
@@ -22,7 +23,7 @@ module Codebreaker
 
     def check (gues)
       raise ArgumentError, 'argument length must be equal 4' unless gues.to_s.length == CODE_LENGTH
-      raise ArgumentError, 'argument must contain only numbers from 1 to 6' unless gues.to_s[/[1-6]{4}/] == gues.to_s
+      raise ArgumentError, 'argument must contain only numbers from 1 to 6' unless gues.to_s[/[1-6]+/].length == CODE_LENGTH
       
       pluses = minuses = '' 
       sc_array = @secret_code.split('')
@@ -42,9 +43,10 @@ module Codebreaker
           minuses += '-'
         end
       end
-      @round_number += 1
-
       result = pluses + minuses
+      @gues_and_results[@round_number] = [gues.to_s, result]
+      @round_number += 1
+      result
     end
 
     def hint
