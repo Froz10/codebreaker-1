@@ -12,7 +12,7 @@ module Codebreaker
       @secret_code = ""
       @round_number = 0
       @hints_used = 0
-      @gues_and_results = {}
+      @gues_results = {}
     end
  
     def start
@@ -44,7 +44,7 @@ module Codebreaker
         end
       end
       result = pluses + minuses
-      @gues_and_results[@round_number] = [gues.to_s, result]
+      @gues_results[gues.to_s] = result
       @round_number += 1
       result
     end
