@@ -6,7 +6,7 @@ module Codebreaker
     ROUND_PENALTY = 10
     HINT_PENALTY = 50
 
-    attr_reader :round_number, :gues_and_results
+    attr_reader :round_number, :gues_results
 
     def initialize
       @secret_code = ""
