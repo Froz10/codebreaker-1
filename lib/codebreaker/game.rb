@@ -54,6 +54,7 @@ module Codebreaker
 
     def hint
       if @hint_val.to_s.empty?
+        @hint_val = ''
         hint_pos = Random.rand(CODE_LENGTH);
         hint_pos.times {@hint_val += '*'}
         @hint_val += @secret_code[hint_pos].to_s
