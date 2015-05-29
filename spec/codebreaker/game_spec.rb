@@ -110,24 +110,17 @@ module Codebreaker
     end
 
     context "#hint" do
-      
-      it "can be called" do
-        expect{game.hint}.not_to raise_error
+
+      it "change hint_val when called first time" do
+        expect{game.hint}.to change{game.hint_val}
       end
-      it "can be called HINTS_COUNT times" do
-        expect{Game::HINTS_COUNT.times {game.hint}}.not_to raise_error
+      it "not change hint_val when called not first time" do
+        game.hint
+        expect{game.hint}.not_to change{game.hint_val}
       end
-      it "can be called only HINTS_COUNT times" do
-        Game::HINTS_COUNT.times {game.hint}
-        expect{game.hint}.to raise_error
-      end
-      
-      it "returns char number from 1 to 6" do
+      it "returns one number of the secret code with * " do
         game.instance_variable_set(:@secret_code, '3126')
-        expect(game.hint).to match(/[1-6]+/)
-      end
-      it "returns one number of the secret code" do
-        expect(game.instance_variable_get(:@secret_code)).to match /#{game.hint}/
+        expect(['3***','*1**','**2*','***6']).to include game.hint
       end
     end
 
@@ -136,10 +129,10 @@ module Codebreaker
         expect(game.score).to be_instance_of(Fixnum)
       end
       it "return write value" do
-        round_number = hints_used = 5
+        round_number = 5
         game.instance_variable_set(:@round_number, round_number)
-        game.instance_variable_set(:@hints_used, hints_used)
-        val = Game::MAX_SCORE - hints_used*Game::HINT_PENALTY - round_number*Game::ROUND_PENALTY
+        game.instance_variable_set(:@hint_val, '**3*')
+        val = Game::MAX_SCORE - Game::HINT_PENALTY - round_number*Game::ROUND_PENALTY
         expect(game.score).to eq(val)
       end
       it "changes with new round" do

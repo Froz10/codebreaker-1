@@ -1,20 +1,19 @@
 module Codebreaker
   class Game
-    HINTS_COUNT = 2
     MAX_SCORE = 500
     MAX_ROUNDS = 500
     CODE_LENGTH = 4
     ROUND_PENALTY = 10
     HINT_PENALTY = 50
 
-    attr_reader :round_number, :gues_results, :game_status
+    attr_reader :round_number, :gues_results, :game_status, :hint_val
 
     def initialize
-      @secret_code = ""
+      @secret_code = ''
       @round_number = 0
-      @hints_used = 0
       @gues_results = {}
       @game_status = 'play'
+      @hint_val = ''
     end
  
     def start
@@ -54,13 +53,19 @@ module Codebreaker
     end
 
     def hint
-      raise 'Called hint to many times' unless @hints_used < HINTS_COUNT
-      @hints_used += 1     
-      @secret_code[Random.rand(4)]
+      if @hint_val.empty?
+        hint_pos = Random.rand(CODE_LENGTH);
+        hint_pos.times {@hint_val += '*'}
+        @hint_val += @secret_code[hint_pos].to_s
+        (CODE_LENGTH - hint_pos - 1).times {@hint_val += '*'}
+      end
+      @hint_val
     end
 
     def score
-      MAX_SCORE - @hints_used*HINT_PENALTY - @round_number*ROUND_PENALTY
+      hints_used = 0
+      hints_used = 1 unless @hint_val.empty?
+      MAX_SCORE - hints_used*HINT_PENALTY - @round_number*ROUND_PENALTY
     end
   end
 end
